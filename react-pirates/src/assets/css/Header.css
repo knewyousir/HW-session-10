@@ -1,0 +1,30 @@
+.header {
+    min-height: 220px;
+    padding: 20px;
+    color: #333;
+    background-color: #bada55;
+    background-image: url(../img/hero.png);
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
+    background-size: 50%;
+    position: relative;
+}
+
+h1 {
+    font-family: 'Pirata One', cursive;
+    font-size: 5rem;
+    color: #C90813;
+    line-height: 1.1;
+}
+
+.logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 230px;
+    position: absolute;
+    opacity: 0.2;
+}
+
+@keyframes App-logo-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
