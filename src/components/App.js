@@ -69,15 +69,45 @@ class App extends Component {
         .then(this.setState({pirates}))
       }
       
+      // addPirate(pirate) {
+      //   const locPirates = { ...this.state.pirates }
+      //   console.log(locPirates)
+      //   axios.post('http://localhost:3005/api/pirates/', pirate)
+      //   .then(response => console.log(response.data))
+      //     .then(locPirates[pirate] = pirate)
+      //     .then(console.log(locPirates))
+      //     // .then(response => this.setState({
+      //     //   pirates: response.data
+      //     // }))
+      //   // replaces all state with returned values
+      // }
+      
       addPirate(pirate) {
-        const localPirates = { ...this.state.pirates }
-        // console.log(localPirates)
-        axios.post('http://localhost:3005/api/pirates/', pirate)
-          .then(response => localPirates.key[pirate] = response.data)
-          // .then(Object.keys(localPirates).push(response.data))
-          .then(console.log(localPirates))
-          // .then(response => this.setState({ pirates: response.data }) // replaces all state with returned values
-          }
+        console.log(pirate)
+        const locPirates = { ...this.state.pirates }
+        // console.log(locPirates)
+        fetch('http://localhost:3005/api/pirates/',
+        {
+          method: 'post',
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            // "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: JSON.stringify(pirate)
+        })
+        .then(response => response.json()
+        .then(data => ({
+          data: data,
+          status: response.status
+        }))
+        .then(res => locPirates[pirate] = res.data)
+        )
+        // .then(console.log(locPirates))  // object object
+        .then(this.setState({
+          pirates: locPirates
+        }))
+        // replaces all state with returned values
+      }
       
     }
     
