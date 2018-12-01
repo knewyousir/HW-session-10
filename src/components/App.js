@@ -106,6 +106,7 @@ class App extends Component {
         .then(this.setState({
           pirates: locPirates
         }))
+        .then (console.log(locPirates))
         // replaces all state with returned values
       }
       
