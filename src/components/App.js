@@ -42,8 +42,13 @@ class App extends Component {
     }
   
     if (isLoading) {
-      return <p>Loading ...</p>;
-    }
+      return (
+        <React.Fragment>
+        <Header headline="Loading Pirates!" />
+        <p>Loading ...</p>
+        </React.Fragment>
+        ) 
+      }
     
     return (
       <div className="App">
