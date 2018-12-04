@@ -1,0 +1,21 @@
+.nav {
+  display: flex;
+  list-style: none;
+  background: #007eb6;
+  padding: 0.25rem;
+  margin: 0;
+  border: 4px solid #007eb6;
+  font-family: 'Trade Winds', cursive;
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 0.25rem  0.5rem;
+  margin-right: 0.5rem;
+}
+
+.nav a.active {
+  color: #007eb6;
+  background: #fff;
+}
