@@ -4,6 +4,52 @@
 
 Create an account on Firebase and retrofit the done files to use your own database.
 
+1. Create a free account at [Firebase](https://firebase.com/)
+1. Create a new project called `<firstname>-<lastname>-pirates`
+1. Create Project
+1. Go to the empty database (left hand menu)
+
+Click on Create Database at the top and choose `Start in Test Mode`.
+
+This changes the defaults to:
+
+```js
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write;
+    }
+  }
+}
+```
+
+In Firebase click on Project Overview > Add Firebase to your web app.
+
+Extract the following information:
+
+```js
+apiKey: "XXXXXXXX",
+authDomain: "XXXXXXXX",
+databaseURL: "XXXXXXXXX",
+```
+
+And use it in your copy of `base.js`:
+
+```js
+import Rebase from 're-base';
+
+const base = Rebase.createClass({
+  apiKey: "XXXXXXXXXXX",
+  authDomain: "test-pirates-b5b9a.firebaseapp.com",
+  databaseURL: "https://test-pirates-b5b9a.firebaseio.com",
+  projectId: "test-pirates-b5b9a",
+  storageBucket: "test-pirates-b5b9a.appspot.com",
+  messagingSenderId: "758151016053"
+});
+
+export default base;
+```
+
 ## Reading
 
 
@@ -22,7 +68,7 @@ Review and test the loading state.
 
 We will add routing to our current project. The goal is to create a master / detail view for our pirates.
 
-Install
+Install the router:
 
 `npm install --save react-router-dom`
 
@@ -40,12 +86,13 @@ ReactDOM.render((
 
 ## Main Routes
 
-Nav.js:
+Create a navbar for top level routing. We will use `NavLink` to take advantage of the `active` states it provides.
+
+`Nav.js`:
 
 ```js
 import React from 'react';
 import {NavLink} from 'react-router-dom';
-// import '../assets/css/Nav.css'
 
 function Nav(){
   return (
@@ -66,34 +113,26 @@ function Nav(){
 export default Nav
 ```
 
-Import to App.js and add it below the header in the render method.
+Import it in `App.js` and add it below the header in the render method.
 
-Add Nav.css
+`App.js`:
 
-```css
-.nav {
-  display: flex;
-  list-style: none;
-  background: #007eb6;
-  padding: 0.5rem;
-  margin: 0;
-  border: 4px solid #007eb6;
-  font-family: 'Trade Winds', cursive;
-}
-
-.nav a {
-  color: #fff;
-  text-decoration: none;
-  padding: 0.5rem;
-}
-
-.nav a.active {
-  color: #007eb6;
-  background: #fff;
-}
+```js
+import Nav from './Nav';
+...
+return (
+  <div className="App">
+    <Header headline="Pirates!" />
+    <Nav />
 ```
 
-Home.js
+Import `Nav.css` into `Nav.js`:
+
+`import '../assets/css/Nav.css';`
+
+Create a component for the root route.
+
+`Home.js`:
 
 ```js
 import React from 'react';
@@ -102,7 +141,7 @@ import { Link } from 'react-router-dom';
 const Home = () => {
   return (
     <div className="home">
-      <h1>Home</h1>
+      <h2>Home</h2>
       <Link to='/pirates'>See em All</Link>
     </div>
     )
@@ -111,11 +150,17 @@ const Home = () => {
 export default Home;
 ```
 
-Import Home into App.js.
+Import `Home` into `App.js`.
 
- App.js
+`import Home from './Home';`
+
+## Routing and Switching
+
+`App.js`:
 
  ```js
+import { Route, Switch } from 'react-router-dom';
+...
 return(
   <Route>
     <React.Fragment>
@@ -123,11 +168,16 @@ return(
     <Nav />
     <Switch>
       <Route exact path='/' component={Home} />
+      <Route render={() => {
+        return <h2>Not found</h2>
+      }} />
     </Switch>
     </React.Fragment>
   </Route>
 )
 ```
+
+Note that we can use `<Route render={}>` instead of specifying a component.
 
  <!-- ```js
  return(
@@ -154,12 +204,13 @@ return(
 }
 ``` -->
 
+Expand the routes to include components for `/pirates` and a new route `/pirates:number`.
+
 `App.js`:
 
 ```js
-import { Switch, Route } from 'react-router-dom';
-import Pirates from './components/Pirates';
-import PirateDetail from './components/PirateDetail';
+import Pirates from './Pirates';
+import PirateDetail from './PirateDetail';
 ...
 return(
   <Route>
@@ -170,25 +221,16 @@ return(
     <Route exact path='/' component={Home} />
     <Route exact path='/pirates' component={Pirates} />
     <Route path='/pirates/:number' component={PirateDetail} />
+    <Route render={ () => {
+      return <h2>Not found</h2>
+    }} />
   </Switch>
     </React.Fragment>
   </Route>
 )
 ```
 
-We need to create a `PirateDetail` and a `Pirates` component. We will no longer be using the `Pirate` component.
-
-`PirateDetail`:
-
-```js
-import React from 'react';
-
-const PirateDetail = () => (
-  <p>PirateDetail</p>
-)
-
-export default PirateDetail;
-```
+`PirateDetail` and `Pirates` are simple functional components. We will edit `Pirates` to make it a class-based component that returns a hard coded link.
 
 `Pirates.js`:
 
@@ -197,7 +239,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import '../assets/css/Pirate.css';
 
-class Pirate extends Component {
+class Pirates extends Component {
   render(){
     return (
       <div className='pirate'>
@@ -208,7 +250,7 @@ class Pirate extends Component {
       )
     }
   }
-  export default Pirate;
+  export default Pirates;
 ```
 
 Edit `PirateDetail` to include a Link back to home.
@@ -216,25 +258,34 @@ Edit `PirateDetail` to include a Link back to home.
 `PirateDetail.js`:
 
 ```js
-<Link to='/pirates'>Back</Link>
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const PirateDetail = () => (
+  <React.Fragment>
+  <h2>PirateDetail</h2>
+  <Link to='/pirates'>Back</Link>
+  </React.Fragment>
+  )
+  
+  export default PirateDetail;
 ```
 
-For this example we are going to use a different [method for rendering the component](https://reacttraining.com/react-router/web/api/Route). In the previous exercise we used the `<Route component>` method: `<Route exact path='/pirates' component={AllPirates}/>` Here we will use the `<Route render>` method. This will allow us to pass in additional props on top of the Route props (match, location, history).
+We are going to [render the Pirates component](https://reacttraining.com/react-router/web/api/Route) instead of using the component method: `<Route exact path='/pirates' component={AllPirates}/>`. This will allow us to pass in additional props to the component as well as the Route props (match, location, history).
 
-We will use the `render` route to pass state to Pirates:
+Use the `render` route to pass state to Pirates.
+
+`App.js`:
 
 ```js
-return (
-
 <Route exact path='/pirates' render={(props) => (
   <Pirates {...props} details={this.state.pirates}  />
 )} />
-
 ```
 
 Use the React inspector to examine the Pirate component. Note that it has access to a details prop in addition to the routing props.
 
-Now we will use the details props to render our pirates list.
+Use the details props to render our pirates list.
 
 Edit `Pirates.js`:
 
@@ -243,16 +294,16 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import '../assets/css/Pirate.css';
 
-class Pirate extends Component {
+class Pirates extends Component {
   
   render(){
-    const { details } = this.props.details;
+    const { details } = this.props;
     return (
       <div className='pirate'>
       <ul>
 
         {
-          this.props.details.map( p => (
+          details.map( p => (
             <li key={p._id}>
               <Link to={`pirates/${p._id}`}>{p.name}</Link>
             </li>
@@ -263,10 +314,10 @@ class Pirate extends Component {
       )
     }
   }
-  export default Pirate;
+  export default Pirates;
 ```
 
-NB: `Pirate.css`:
+Make this change to `Pirate.css`:
 
 ```css
 .pirate ul {
@@ -276,7 +327,7 @@ NB: `Pirate.css`:
 }
 ```
 
-Let's try fleshing out the detail view.
+OUr links are referencing the `PirateDetail` component but with the static content. Let's make it dynamic.
 
 Edit `PirateDetail`:
 
@@ -288,7 +339,6 @@ const PirateDetail = (props) => {
 
 const pirate = props.details.filter(
   p => p._id === props.match.params.number
-  // p => p.name === 'Gary Glitter'
   )
   
   console.log(pirate)
@@ -306,25 +356,20 @@ const pirate = props.details.filter(
   export default PirateDetail
 ```
 
-We will need to pass state to this component as well.
+Note the error. We will need to pass state to this component as well.
 
-App.js:
+`App.js`:
 
 ```js
-<Route exact path='/pirates' render={(props) => (
-  <Pirates {...props} details={this.state.pirates}  />
-  )
-} />
-
 <Route path='/pirates/:number' render={(props) => (
   <PirateDetail {...props} details={this.state.pirates} />
   )
 } />
 ```
 
-Inspect the `PirateDetail` component using React's tools.
+<!-- ISSUE - already added match props above -->
 
-Now we will display the details.
+<!-- Inspect the `PirateDetail` component using React's tools.
 
 Recall the method used in the previous (non routing) version of Pirate.js:
 
@@ -409,32 +454,9 @@ The filter returns an arrary of one item.
 
 `console.log(pirate)`
 
-`console.log(pirate[0])`
+`console.log(pirate[0])` -->
 
-```js
-import React from 'react';
-import { Link } from 'react-router-dom'
-
-const PirateDetail = (props) => {
-
-const pirate = props.details.filter(
-  p => p._id === props.match.params.number
-  )
-  
-  return (
-    <div className='pirate'>
-    <ul>
-    <li>Name: {pirate[0].name}</li>
-    <li>Vessel: {pirate[0].vessel}</li>
-    <li>Weapon: {pirate[0].weapon}</li>
-    </ul>
-    <Link to='/pirates'>Back</Link>
-    </div>
-    )
-  }
-  
-  export default PirateDetail
-```
+Add the additional details.
 
 ```js
 import React from 'react';
@@ -463,30 +485,17 @@ const pirate = props.details.filter(
   export default PirateDetail
 ```
 
+REFRESHING PROBLEMS! Need a central data store.
+
 ## Real Time Data
 
-Demo using db on Firebase. Firebase is like one big object.
+Up to this point we have been using our Express API for data services. We will now use Firebase - a cloud-hosted, NoSQL database that stores and syncs our data in realtime.
 
-1. Create a free account at [Firebase](https://firebase.com/)
-1. Create a new project called `<firstname>-<lastname>-pirates`
-1. Create Project
-1. Go to the empty database (left hand menu)
+[Rebase](https://www.npmjs.com/package/rebase) is a utility that we are going to use to connect to Firebase and bind the data so whenever your data changes, your state will be updated.
 
-Click on Create Database at the top and choose `Start in Test Mode`.
+`npm install re-base@2.2.0 --save`
 
-This changes the defaults to:
-
-```js
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write;
-    }
-  }
-}
-```
-
-in src create `base.js`
+In `src` create `base.js`:
 
 ```js
 import Rebase from 're-base'
@@ -497,10 +506,6 @@ const base = Rebase.createClass({
 
 export default base;
 ```
-
-[Rebase](https://www.npmjs.com/package/rebase) is a utility that we are going to use to connect to Firebase and bind the data so whenever your data changes, your state will be updated.
-
-`npm install re-base@2.2.0 --save`
 
 ### Add domain, database URL, API key
 
@@ -514,7 +519,7 @@ authDomain: "XXXXXXXX",
 databaseURL: "XXXXXXXXX",
 ```
 
-* e.g. in `base.js`:
+In `base.js`:
 
 ```js
 import Rebase from 're-base';
@@ -533,15 +538,17 @@ export default base;
 
 * `App.js`:
 
-`import base from './base'`
+```js
+import base from '../base';
+```
 
 ## React Component Lifecycle
 
 [Documentation](https://reactjs.org/docs/react-component.html).
 
-* component will mount - hooks into component before it is displayed.
+`componentWillMount` - hooks into component before it is displayed.
 
-* `App`:
+`App.js`:
 
 ```js
 componentWillMount(){
