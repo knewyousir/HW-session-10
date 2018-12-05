@@ -42,13 +42,8 @@ class App extends Component {
     }
   
     if (isLoading) {
-      return (
-        <React.Fragment>
-        <Header headline="Loading Pirates!" />
-        <p>Loading ...</p>
-        </React.Fragment>
-        ) 
-      }
+      return <p>Loading ...</p>;
+    }
     
     return (
       <div className="App">
@@ -81,7 +76,22 @@ class App extends Component {
     .then(delete pirates[key])
     .then(this.setState({pirates}))
   }
-  
+
+  // addPirate(pirate) {
+  //   console.log(pirate)
+  //   const pirates = {...this.state.pirates}
+  //   axios.post('http://localhost:3005/api/pirates/', pirate )
+  //   .then(response => response.data)
+  //   .then(this.setState({ pirates: pirates }))
+  // }
+
+  // addPirate(pirate) {
+  //   const pirates = { ...this.state.pirates }
+  //   axios.post('http://localhost:3005/api/pirates/', pirate)
+  //   pirates[pirate] = pirate
+  //   this.setState({ pirates: pirates })
+  // }
+
   addPirate(pirate) {
     const pirates = { ...this.state.pirates }
     axios.post('http://localhost:3005/api/pirates/', pirate)
