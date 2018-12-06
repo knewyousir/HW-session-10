@@ -33,9 +33,10 @@ authDomain: "XXXXXXXX",
 databaseURL: "XXXXXXXXX",
 ```
 
-And use it in your copy of `base.js`:
+And use it in your own copy of `base.js`:
 
-Now add another sign in method using Facebook, Twitter etc.
+* Add another sign in method using Facebook, Twitter etc.
+* Only admins should be able to delete pirates - move the delete pirate function to PirateForm
 
 ## Persisting the Data Continued
 
