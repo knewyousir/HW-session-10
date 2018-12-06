@@ -50,6 +50,8 @@ const base = Rebase.createClass({
 export default base;
 ```
 
+Add another authentication method: Facebook, Twitter...
+
 
 ## Persisting the Data Continued
 
@@ -62,22 +64,32 @@ In session-10-react run `npm start` to fire up the react app.
 
 Review and test the loading state. 
 
-in `src` create `base.js`
+## Real Time Data
 
-```js
-import Rebase from 're-base'
-
-const base = Rebase.createClass({
-
-})
-
-export default base;
-```
+Up to this point we have been using our Express API for data services. We will now use Firebase - a cloud-hosted, NoSQL database that stores and syncs our data in realtime.
 
 [Rebase](https://www.npmjs.com/package/rebase) is a utility that we are going to use to connect to Firebase and bind the data so whenever your data changes, your state will be updated.
 
-<!-- `$ npm install re-base --save` -->
-`$ npm install re-base@2.2.0 --save`
+`npm install re-base --save`
+
+`npm install firebase --save`
+
+In `src` create `base.js`
+
+```js
+import Rebase from 're-base';
+import firebase from 'firebase';
+
+const firebaseApp = firebase.initializeApp({
+
+});
+
+const base = Rebase.createClass(firebaseApp.database());
+
+export { firebaseApp };
+
+export default base;
+```
 
 ### Add domain, database URL, API key
 
@@ -95,19 +107,28 @@ databaseURL: "XXXXXXXXX",
 
 ```js
 import Rebase from 're-base';
+import firebase from 'firebase';
 
-const base = Rebase.createClass({
+const firebaseApp = firebase.initializeApp({
   apiKey: 'AIzaSyAHnKw63CUBAqSuCREgils_waYJ0qwpGiU',
   authDomain: 'daniel-deverell-pirates.firebaseapp.com',
   databaseURL: 'https://daniel-deverell-pirates.firebaseio.com'
 });
+
+const base = Rebase.createClass(firebaseApp.database());
+
+export { firebaseApp };
 
 export default base;
 ```
 
 * `App.js`:
 
-`import base from './base'`
+```js
+import base from '../base';
+```
+
+<!-- marker -->
 
 ## React Component Lifecycle
 
@@ -116,15 +137,6 @@ export default base;
 * component will mount - hooks into component before it is displayed.
 
 * `App`:
-
-<!-- ```js
-componentWillMount(){
-  this.ref = base.syncState(`daniel-deverell-pirates/pirates`, {
-    context: this,
-    state: 'pirates'
-  })
-}
-``` -->
 
 ```js
 componentDidMount(){
@@ -512,6 +524,8 @@ import base from '../base';
 import { firebaseApp } from '../base';
 import firebase from 'firebase';
 ```
+
+<!-- marker -->
 
 <!-- ```js
 authenticate(provider){
@@ -1270,6 +1284,8 @@ const pirate = props.details.filter(
 REFRESHING PROBLEMS! Need a central data store.
 
 ## Real Time Data
+
+<!-- marker -->
 
 Up to this point we have been using our Express API for data services. We will now use Firebase - a cloud-hosted, NoSQL database that stores and syncs our data in realtime.
 

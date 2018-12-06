@@ -35,23 +35,7 @@ databaseURL: "XXXXXXXXX",
 
 And use it in your copy of `base.js`:
 
-```js
-import Rebase from 're-base';
-
-const base = Rebase.createClass({
-  apiKey: "XXXXXXXXXXX",
-  authDomain: "test-pirates-b5b9a.firebaseapp.com",
-  databaseURL: "https://test-pirates-b5b9a.firebaseio.com",
-  projectId: "test-pirates-b5b9a",
-  storageBucket: "test-pirates-b5b9a.appspot.com",
-  messagingSenderId: "758151016053"
-});
-
-export default base;
-```
-
-## Reading
-
+Now add another sign in method using Facebook, Twitter etc.
 
 ## Persisting the Data Continued
 
