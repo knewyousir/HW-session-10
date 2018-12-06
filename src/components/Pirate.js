@@ -11,8 +11,7 @@ class Pirate extends Component {
       <li>{details.weapon}</li>
       <li>{details.vessel}</li>
       <li><button onClick={() => this.props.removePirate(this.props.index)}>✖︎</button></li>
-      {/* <li><button onClick={() => this.props.removePirate(this.props.key)}>✖︎</button></li> */}
-        </ul>
+      </ul>
       </div>
       )
     }
