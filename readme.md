@@ -62,8 +62,7 @@ export default base;
 
 [Rebase](https://www.npmjs.com/package/rebase) is a utility that we are going to use to connect to Firebase and bind the data so whenever your data changes, your state will be updated.
 
-<!-- `$ npm install re-base --save` -->
-`$ npm install re-base@2.2.0 --save`
+`npm install re-base@2.2.0 --save`
 
 ### Add domain, database URL, API key
 
