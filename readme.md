@@ -1,4 +1,4 @@
-# IX - React Router, RealTime DataBases
+# IX - React Router, Realtime Databases
 
 ## Homework
 
@@ -9,23 +9,26 @@ Create an account on Firebase and retrofit the done files to use your own databa
 1. Create Project
 1. Go to the empty database (left hand menu)
 
-Click on Create Database at the top and choose `Start in Test Mode`.
+Click on Add Project and assign it a name you'll remember.
+
+Click on database and create a realtime database. 
+
+Start in test mode.
 
 This changes the defaults to:
 
 ```js
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write;
-    }
+{
+  "rules": {
+    ".read": true,
+    ".write": true
   }
 }
 ```
 
-In Firebase click on Project Overview > Add Firebase to your web app.
+Click on Project Overview and add Firebase to your web app (`</>`).
 
-Extract the following information:
+Copy the following information:
 
 ```js
 apiKey: "XXXXXXXX",
