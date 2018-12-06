@@ -442,27 +442,6 @@ constructor() {
 
 Add an if statement that shows a button to log in:
 
-<!-- ```js
-render(){
-  const logout = <button>Log Out</button>;
-  if(!this.state.uid) {
-    return <div>{this.renderLogin()}</div>
-  }
-
-  return (
-    <div>
-    {logout}
-    <h3>Pirate Form Component</h3>
-    {Object.keys(this.props.pirates).map(this.renderPirates)}
-    <h3>Pirate Form Component</h3>
-    <AddPirateForm addPirate={this.props.addPirate} />
-    <button onClick={this.props.loadSamples}>Load Sample Pirates</button>`
-    </div>
-    )
-  }
-}
-``` -->
-
 ```js
 render(){
 
@@ -581,7 +560,7 @@ render(){
 
 Test by logging in and out. Note the user in Firebase. This can be deleted if you need to re-login.
 
-Our data is now served in real time from Firebase. The only function that requires our API is 'Load Sample Pirates' and 'Add Pirate.'
+Our data is now served in real time from Firebase. The only function that requires our API is 'Add Pirate.'
 
 Since changing the state automatically updates the database we can revert to using an older addPirate function:
 
@@ -593,6 +572,8 @@ addPirate(pirate) {
   this.setState({ pirates: pirates })
 }
 ```
+
+Uninstall axios and remove its reference in `App.js`.
 
 ## Routing
 
