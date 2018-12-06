@@ -92,7 +92,7 @@ export default base;
 
 * `App.js`:
 
-`import base from './base'`
+`import base from '../base'`
 
 ## React Component Lifecycle
 
@@ -111,7 +111,37 @@ componentWillMount(){
 }
 ```
 
-Note the path and the object.
+Note the path and the object. 
+
+Demo - changing the path.
+
+Remove references to error and loading. We will add these back later.
+
+```js
+  constructor() {
+    super();
+    this.addPirate = this.addPirate.bind(this);
+    this.loadSamples = this.loadSamples.bind(this);
+    this.removePirate = this.removePirate.bind(this);
+    this.state = {
+      pirates: {}
+    }
+  }
+
+  componentWillMount(){
+    this.ref = base.syncState(`daniel-deverell-pirates/pirates`, {
+      context: this,
+      state: 'pirates'
+    })
+  }
+
+  render() {
+    return (
+      <div className="App">
+      ...
+```
+
+It is a good practice to remove the data binding on unmount.
 
 ```js
 componentWillUmount(){
@@ -148,8 +178,6 @@ Make the state available to the `PirateForm`
 
 * `App.js`:
 
-`pirates={this.state.pirates}`:
-
 ```js
 <PirateForm
 pirates={this.state.pirates}
@@ -159,9 +187,9 @@ loadSamples={this.loadSamples}
 </div>
 ```
 
-* `PirateForm.js`:
+Call `renderPirates` with a `.map`.
 
-Call `renderPirates` with a `.map`:
+* `PirateForm.js`:
 
 ```js
 render(){
@@ -186,30 +214,28 @@ Note that we are calling this method from the return value of the component's re
 Update the method to display additional data:
 
 ```js
-  renderPirates(key){
-    const pirate = this.props.pirates[key]
-    return (
-    <div key={key}>
-      <p>{key}</p>
-      <input value={pirate.name} type="text" name="name" placeholder="Pirate name" />
-      <input value={pirate.weapon} type="text" name="weapon" placeholder="Pirate weapon" />
-      <input value={pirate.vessel} type="text" name="vessel" placeholder="Pirate vessel" />
+renderPirates(key){
+  const pirate = this.props.pirates[key]
+  return (
+  <div key={key}>
+    <p>{key}</p>
+    <input value={pirate.name} type="text" name="name" placeholder="Pirate name" />
+    <input value={pirate.weapon} type="text" name="weapon" placeholder="Pirate weapon" />
+    <input value={pirate.vessel} type="text" name="vessel" placeholder="Pirate vessel" />
 
-    </div>
-    )
-  }
+  </div>
+  )
+}
 ```
 
 Note the error. We need a constructor.
 
 ```js
-  constructor() {
-    super();
-    this.renderPirates = this.renderPirates.bind(this);
-  }
+constructor() {
+  super();
+  this.renderPirates = this.renderPirates.bind(this);
+}
 ```
-
-Try changing `<div key={key}>` to `<div>` to see why this is included. Be sure to change it back again.
 
 Again, note the error. React only allows you to put state into a field if you have the intention of editing it. We will use `onChange`.
 
@@ -221,7 +247,14 @@ Listen for a change on one input with `onChange={ (e) => this.handleChange(e, ke
   type="text" name="name" placeholder="Pirate name" />
 ```
 
-Create the method:
+Comment out the other input fields temporarily to quiet the error.
+
+```js
+{/* <input value={pirate.weapon} type="text" name="weapon" placeholder="Pirate weapon" />
+    <input value={pirate.vessel} type="text" name="vessel" placeholder="Pirate vessel" /> */}
+```
+
+Create the method that is called from the onChange event handler::
 
 ```js
 handleChange(e, key){
@@ -229,7 +262,7 @@ handleChange(e, key){
 }
 ```
 
-Remember to bind it in the constructor:
+Bind it in the constructor:
 
 ```js
 constructor() {
@@ -253,26 +286,23 @@ handleChange(e, key){
 
 Note the values for `e.target.name` and `e.target.value`.
 
-Values need to be put into state.
+These values need to be put into state.
 
-<!-- We need a copy of the object. This is the old method:
+We will use spread operator and overlay the new properties on top of it. 
 
-`const updatedPIrate = Object.assign([], pirate)` -->
-
-We will use spread operator and overlay the new properties on top of it. `e.target.name` gives us the property name so we will use what's known as a computed property:
+`e.target.name` gives us the name of the property we want to change and `e.target.value` give us the value of that property. We will use what's known as a computed property:
 
 ```js
 handleChange(e, key){
   const pirate = this.props.pirates[key]
   const updatedPirate = {
-    ...pirate,
-    [e.target.name]: e.target.value
+    ...pirate, [e.target.name]: e.target.value
   }
   console.log(updatedPirate)
 }
 ```
 
-## Moving the Function to App.js
+## Updating the Pirate
 
 Pass the updated pirate to the App component for updating.
 
@@ -284,19 +314,6 @@ updatePirate(key, updatedPirate){
   pirates[key] = updatedPirate;
   this.setState({ pirates })
 }
-```
-
-Pass the method to the component.
-
-`updatePirate={this.updatePirate}`:
-
-```js
-<PirateForm
-  updatePirate={this.updatePirate}
-  pirates={this.state.pirates}
-  addPirate={this.addPirate}
-  loadSamples={this.loadSamples}
-/>
 ```
 
 Bind it.
@@ -315,6 +332,19 @@ constructor() {
 }
 ```
 
+And pass the method to the component with `updatePirate={this.updatePirate}`:
+
+```js
+<PirateForm
+  updatePirate={this.updatePirate}
+  pirates={this.state.pirates}
+  addPirate={this.addPirate}
+  loadSamples={this.loadSamples}
+/>
+```
+
+Now we can pass the key and the updated pirate to the function:
+
 * `PirateForm.js`:
 
 ```js
@@ -328,9 +358,9 @@ handleChange(e, key){
 }
 ```
 
-Test and note the data sync between the form and the Pirate listing above.
+Test and note the data sync between the form and the Pirate listing.
 
-Add the onChange handler to the other fields.
+Add the `onChange` handler to the other fields.
 
 ```js
 renderPirates(key){
@@ -346,19 +376,31 @@ renderPirates(key){
 }
 ```
 
-Test and exmine Firebase. We now have two way communication with the database. No Submit button required.
+Test and examine Firebase. We now have two way communication with the database. No Submit button required.
 
-## Authentication
+## Authentication Set Up
 
-* Firebase:
+* On Firebase.com:
 
-Enable Github authentication in Firebase under `Authentication > Sign In Method`
+Enable Github authentication in Firebase under `Authentication > Sign In Method`.
 
-* Github:
+Copy the callback URL at the bottom.
+
+* On Github.com:
 
 Sign in, navigate to `Settings` (top left under your account). Find `Developer Settings > OAuth Apps` and register a new OAuth application.
 
-Copy the URL from Firebase and enter the Client ID and Client Secret into Firebase.
+Paste the callback URL from Firebase into Github's Authorization callback URL.
+
+* On Firebase.com:
+
+Enter the Client ID and Client Secret you got from Github.
+
+## Authentication Implementation
+
+We will implement authentication in the PirateForm component.
+
+Create a new function:
 
 * `PirateForm.js`:
 
@@ -425,6 +467,7 @@ render(){
 render(){
 
   const logout = <button>Log Out</button>;
+
   if(!this.state.uid) {
     return <div>{this.renderLogin()}</div>
   }
@@ -441,7 +484,7 @@ render(){
 }
 ```
 
-Note the code location here - in the render method but not in the return. Also note the use of the `logout` variable in the return statement.
+The log out will only be display once we have logged in.
 
 Create the authenticate method and bind it
 
@@ -462,7 +505,7 @@ Create the authenticate method and bind it
   }
 ```
 
-And click on the button to test.
+Click on the button to test.
 
 Import base:
 
@@ -481,13 +524,13 @@ authHandler(err, authData) {
 }
 ```
 
-Test.
-
 Bind the authHandler:
 
 `this.authHandler = this.authHandler.bind(this);`
 
-If no error add uid to state.
+And test to see the user details in the console.
+
+Add uid to state.
 
 ```js
 authHandler(err, authData) {
@@ -537,6 +580,19 @@ render(){
 ```
 
 Test by logging in and out. Note the user in Firebase. This can be deleted if you need to re-login.
+
+Our data is now served in real time from Firebase. The only function that requires our API is 'Load Sample Pirates' and 'Add Pirate.'
+
+Since changing the state automatically updates the database we can revert to using an older addPirate function:
+
+```js
+addPirate(pirate) {
+  const pirates = {...this.state.pirates}
+  const timestamp = Date.now()
+  pirates[`pirate-${timestamp}`] = pirate
+  this.setState({ pirates: pirates })
+}
+```
 
 ## Routing
 
