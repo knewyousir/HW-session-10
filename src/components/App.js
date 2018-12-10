@@ -3,8 +3,7 @@ import Pirate from './Pirate'
 import Header from './Header'
 import PirateForm from './PirateForm'
 import piratesFile from '../data/sample-pirates-object';
-
-import axios from 'axios';
+import base from '../base'
 
 class App extends Component {
   
@@ -13,38 +12,63 @@ class App extends Component {
     this.addPirate = this.addPirate.bind(this);
     this.loadSamples = this.loadSamples.bind(this);
     this.removePirate = this.removePirate.bind(this);
+    this.updatePirate = this.updatePirate.bind(this);
+    this.renderLogin = this.renderLogin.bind(this);
+    this.authenticate = this.authenticate.bind(this);
+    this.authHandler = this.authHandler.bind(this);
+    this.logout = this.logout.bind(this);
     this.state = {
       pirates: {},
+      uid: null,
       isLoading: true,
       error: null
     }
   }
   
   componentDidMount(){
-    this.setState({ isLoading: true });
-    axios.get('http://localhost:3005/api/pirates')
-    .then(response => this.setState({
-      pirates: response.data,
-      isLoading: false
-    }))
-    .catch(error => this.setState({
-      error,
-      isLoading: false
-    }));
+    this.ref = base.syncState(`kevin-birk-pirates/pirates`, {
+      context: this,
+      state: 'pirates'
+    })
+
+    base.onAuth( (user) => {
+      if (user) {
+        this.authHandler(null, { user })
+      }
+    })
   }
   
   render() {
     
-    const { isLoading, error } = this.state;
-    
-    if (error) {
-      return <p>{error.message}</p>;
+    const logout = <button onClick={ () => this.logout() } >Log Out</button>
+
+    if (this.state.uid === null) {
+      return (
+        <div className="App">
+        <Header headline="Pirates!" />
+
+        {
+        Object.keys(this.state.pirates)
+        .map(key =>
+          <Pirate key={key}
+          index={key}
+          details={this.state.pirates[key]}
+          uid={this.state.uid} />)
+        }
+
+        {this.renderLogin()}
+
+        <PirateForm
+          updatePirate={this.updatePirate}
+          pirates={this.state.pirates}
+          loadSamples={this.loadSamples}
+          addPirate={this.addPirate}
+          removePirate={this.removePirate}
+          uid={this.state.uid} />
+        </div>
+      )
     }
-    
-    if (isLoading) {
-      return <p>Loading ...</p>;
-    }
-    
+
     return (
       <div className="App">
       <Header headline="Pirates!" />
@@ -55,35 +79,78 @@ class App extends Component {
           <Pirate key={key}
           index={key}
           details={this.state.pirates[key]}
-          removePirate={this.removePirate} />)
+          removePirate={this.removePirate}
+          uid={this.state.uid} />)
         }
+
+        {logout}
         
-        <PirateForm loadSamples={this.loadSamples} addPirate={this.addPirate} />
+        <PirateForm
+          updatePirate={this.updatePirate}
+          pirates={this.state.pirates}
+          loadSamples={this.loadSamples}
+          addPirate={this.addPirate}
+          uid={this.state.uid} />
         </div>
-        );
+        )
       }
       
-      loadSamples() {
-        this.setState({
-          pirates: piratesFile
-        })
-      }
-      
-      removePirate(key){
-        const pirates = { ...this.state.pirates }
-        let pirateDel = this.state.pirates[key]._id
-        axios.get(`http://localhost:3005/api/pirates/${pirateDel}`)
-        .then(delete pirates[key])
-        .then(this.setState({pirates}))
-      }
-      
-      addPirate(pirate) {
-        const pirates = { ...this.state.pirates }
-        axios.post('http://localhost:3005/api/pirates/', pirate)
-        .then ( pirates[pirate] = pirate )
-        .then(this.setState({ pirates: pirates }))
-      }
-      
+  loadSamples() {
+    this.setState({
+      pirates: piratesFile
+      })
     }
+      
+  removePirate(key){
+    const pirates = { ...this.state.pirates }
+    pirates[key] =null;
+    this.setState({pirates})
+    }
+      
+  addPirate(pirate) {
+    const pirates = { ...this.state.pirates }
+    const timestamp = Date.now()
+    pirates[`pirate-${timestamp}`] = pirate
+    this.setState({ pirates })
+  }
+
+  updatePirate(key, updatedPirate){
+    const pirates = {...this.state.pirates};
+    pirates[key] = updatedPirate;
+    this.setState({ pirates })
+  }
+
+  renderLogin() {
+    return (
+      <React.Fragment>
+        <p>Sign In</p>
+        <button onClick={ () => this.authenticate('github') } >Log in with Github </button>
+        <button onClick={ () => this.authenticate('google') } >Log in with Google </button>
+      </React.Fragment>
+    )
+  }
+
+  authenticate(provider) {
+    console.log(provider);
+    base.authWithOAuthPopup(provider, this.authHandler);
+  }
+
+  authHandler(err, authData) {
+    console.log(authData);
+    if (err){
+      console.log(err);
+      return;
+    }
+    this.setState({
+      uid: authData.user.uid
+    })
+  }
+
+  logout() {
+    base.unauth();
+    this.setState({ uid: null});
+  }
+      
+}
     
-    export default App;
+export default App;
